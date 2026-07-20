@@ -14,6 +14,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
     <title>SAO 設定＆シナリオ推測ツール</title>
     <style>
+      @font-face {
+        font-family: 'saofont';
+        src: url('sao_font.ttf') format('truetype'); 
+    }
+    #battle_result_msg, 
+    #btn_switch_action, 
+    #btn_battle_reset
+    #btn_battle_retry {
+        font-family: 'saofont', sans-serif;
+    }
         :root { --primary: #333; --bg: #f4f5f7; --box-bg: #fff; --accent: #e53e3e; --border: #ccc; --blue: #3182ce; --green: #38a169; }
         html { height: 100%; background-color: var(--bg); }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: var(--bg); color: var(--primary); margin: 0; padding: env(safe-area-inset-top, 5px) env(safe-area-inset-right, 5px) env(safe-area-inset-bottom, 10px) env(safe-area-inset-left, 5px); min-height: 100vh; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 14px; }
