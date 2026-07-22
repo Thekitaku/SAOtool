@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="icon" href="favicon.png" type="image/png">
 
   <meta property="og:title" content="SAO設定推測ツール">
   <meta property="og:description" content="スマスロSAOの設定推測、CZテーブル・高確シナリオ、CZ成功期待度の推測ができます。">
@@ -12,34 +12,57 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-    <title>SAO 設定＆シナリオ推測ツール</title>
+    <title>SAO 設定推測ツール</title>
     <style>
-      @font-face {
+        @font-face {
         font-family: 'saofont';
         src: url('sao_font.ttf') format('truetype'); 
     }
     #battle_result_msg, 
     #btn_switch_action, 
     #btn_battle_reset,
-    #btn_battle_retry {
+    #btn_battle_retry,
+    h1 {
         font-family: 'saofont', sans-serif;
     }
         :root { --primary: #333; --bg: #f4f5f7; --box-bg: #fff; --accent: #e53e3e; --border: #ccc; --blue: #3182ce; --green: #38a169; }
         html { height: 100%; background-color: var(--bg); }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: var(--bg); color: var(--primary); margin: 0; padding: env(safe-area-inset-top, 5px) env(safe-area-inset-right, 5px) env(safe-area-inset-bottom, 10px) env(safe-area-inset-left, 5px); min-height: 100vh; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 14px; }
-        h1 { font-size: 1.1rem; text-align: center; margin: 10px 0; }
+        h1 { font-size: 2rem; text-align: center; margin: 10px 0; font-weight: normal; }
         .container { max-width: 600px; margin: 0 auto; padding-bottom: 80px; }
         
-        .main-tabs { display: flex; overflow-x: auto; background: var(--box-bg); border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); scrollbar-width: none; -webkit-overflow-scrolling: touch; gap: 8px; padding: 0 8px; }
+        .main-tabs { display: flex; overflow-x: auto; background: var(--box-bg); border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); scrollbar-width: none; -webkit-overflow-scrolling: touch; gap: 8px; padding: 0 8px; position: sticky;
+        top: 0;
+        z-index: 200;
+        border-radius: 0; /* 画面端にピタッと合わせるため角丸を無効化 */
+        margin: 0;
+    }
         .main-tabs::-webkit-scrollbar { display: none; }
         .m-tab-btn { flex: 0 0 auto; background: none; border: none; padding: 15px 20px; font-size: 0.95rem; font-weight: bold; color: #666; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; transition: color 0.2s; }
         .m-tab-btn.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
         
-        .tab-content { display: none; }
+        .tab-content { display: none; padding-top: 15px;}
         .tab-content.active { display: block; }
         
         .panel { background: var(--box-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .panel-title { font-weight: bold; font-size: 1.05rem; margin-bottom: 12px; border-bottom: 2px solid #eee; padding-bottom: 5px; color: #444; display: flex; justify-content: space-between; align-items: center; }
+        .panel-title { font-weight: bold; font-size: 1.05rem; margin-bottom: 12px; border-bottom: 2px solid #eee; padding-bottom: 5px; color: #444; display: flex; justify-content: flex-start; gap: 8px;  align-items: flex-end; }
+        .title-en {
+        font-family: 'saofont', sans-serif; 
+        font-size: 1.6rem; 
+        font-weight: normal;
+        color: var(--primary); 
+        line-height: 1;
+    }
+
+    .title-jp {
+        font-family: sans-serif; 
+        font-size: 0.85rem;
+        font-weight: normal;
+        color: #777; 
+        line-height: 1;
+        margin-bottom: 3.15px;
+    }
+
         
         .input-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .input-label { flex: 1; font-weight: bold; font-size: 0.95rem; }
@@ -59,14 +82,20 @@
         .btn-hit-sm { background: var(--accent); color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
         .btn-hit:active, .btn-hit-sm:active { background: #c53030; }
 
-        .btn-info { background: #cbd5e0; color: #2d3748; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 0.9rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
+        .btn-info { background: #cbd5e0; color: #2d3748; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 0.9rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-left: auto; }
         .btn-info:active { background: #a0aec0; }
 
         .char-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
         .char-card { background: #fdfdfd; border: 1px solid #eee; padding: 10px; border-radius: 8px; text-align: center; }
         .char-name { font-weight: bold; margin-bottom: 8px; color: #555; }
         
-        .sub-tabs { display: flex; overflow-x: auto; margin-bottom: 15px; gap: 5px; scrollbar-width: none; }
+        .sub-tabs { display: flex; overflow-x: auto; margin-bottom: 15px; gap: 5px; scrollbar-width: none; position: sticky;
+        top: 50px; 
+        z-index: 100; /* 他の要素より手前に表示させる */
+        background-color: var(--bg); /* スクロール時に下の文字が透けないように背景色をつける */
+        padding: 10px 0; /* 見やすくするための上下の余白 */
+        transition: top 0.2s;
+    }
         .sub-tabs::-webkit-scrollbar { display: none; }
         .s-tab-btn { background: #eee; border: none; padding: 8px 12px; border-radius: 20px; font-size: 0.85rem; color: #555; white-space: nowrap; cursor: pointer; }
         .s-tab-btn.active { background: var(--primary); color: #fff; font-weight: bold; }
@@ -111,12 +140,23 @@
         .rank-b { background: #e6f6eb; color: var(--green); font-weight: bold; }
         .rank-c { background: #fee2e2; color: var(--accent); font-weight: bold; }
         .rank-d { background: #f3e8ff; color: #805ad5; font-weight: bold; }
+        
+            #cz_congrats_msg {
+        font-family: 'saofont', sans-serif;
+        color: #ff3333;
+        font-size: 2.2rem;
+        font-weight: normal;
+        text-align: center;
+        margin-top: 15px;
+        display: none;
+    }
+
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>SAO 設定＆シナリオ推測ツール</h1>
+    <h1 style="position: relative;">SLOT Sword Art Online<br> Estimation Tool<span style="position: absolute; right: 5px; bottom: 0; font-size: 0.8rem; color: #888; font-weight: normal; margin-left: 5px;">(v2.1.0)</span></h1>
 
     <div class="main-tabs">
         <button class="m-tab-btn active" onclick="switchMainTab(1)">小役･初当り</button>
@@ -132,7 +172,11 @@
     <!-- ===== タブ1: 小役・初当たり ===== -->
     <div id="tab-1" class="tab-content active">
         <div class="panel">
-            <div class="panel-title">G数入力</div>
+            <div class="panel-title">
+    <span class="title-en">Games</span>
+    <span class="title-jp">G数入力</span>
+</div>
+
             <div class="input-row">
                 <span class="input-label">総通常G数</span>
                 <input type="number" id="inp_normal_g" class="text-input" value="0" onchange="calcAll()">
@@ -149,7 +193,8 @@
         
         <div class="panel">
             <div class="panel-title">
-                <span>カウント</span>
+                <span class="title-en">Count</span>
+    <span class="title-jp">カウント</span>
                 <button class="btn-info" onclick="showInfo('main_count')">ⓘ</button>
             </div>
             <div class="input-row">
@@ -179,7 +224,10 @@
         </div>
 
         <div class="panel">
-            <div class="panel-title">通常時タブからの連動データ</div>
+            <div class="panel-title">
+                <span class="title-en">Status</span>
+    <span class="title-jp">各種ステータス</span>
+    </div>
             <div style="font-size: 0.95rem; line-height: 1.6;">
                 <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:#444; margin-bottom:4px;">
                     <span>初当り・エピソード関連</span>
@@ -257,7 +305,8 @@
     <div id="tab-2" class="tab-content">
         <div class="panel">
             <div class="panel-title">
-                <span>基本キャラ</span>
+                <span class="title-en">Character</span>
+    <span class="title-jp">基本キャラ</span>
                 <button class="btn-info" onclick="showInfo('minichara')">ⓘ</button>
             </div>
             <div class="char-grid">
@@ -292,7 +341,10 @@
             </div>
         </div>
         <div class="panel">
-            <div class="panel-title">特定設定確定キャラ</div>
+            <div class="panel-title">
+                <span class="title-en">SP Character</span>
+    <span class="title-jp">特定設定確定キャラ</span>
+    </div>
             <div class="char-grid">
                 <div class="char-card" style="border-color: #38a169; background: #f0fff4;">
                     <div class="char-name">リーファ (2+)</div>
@@ -318,6 +370,10 @@
 
     <!-- ===== タブ3: 通常時 ===== -->
     <div id="tab-3" class="tab-content overlay-container">
+        <div id="sticky_scen_bar" style="position: fixed; top: 50px; left: 0; right: 0; max-width: 600px; margin: 0 auto; z-index: 150; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); border-bottom: 2px solid var(--accent); padding: 8px 10px; display: none; justify-content: space-around; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box;">
+            <div style="font-size:0.9rem; font-weight:bold;">シナリオ: <span id="sticky_val_scen" style="color:var(--accent);">--</span></div>
+            <div style="font-size:0.9rem; font-weight:bold;">次回CZ: <span id="sticky_val_cz" style="color:var(--blue);">--%</span></div>
+        </div>
         <div id="tab3_overlay" class="disabled-overlay" style="display:none;">
             <div class="disabled-message sticky-message">CZ成功 / 失敗を<br>記録してください</div>
         </div>
@@ -366,7 +422,9 @@
             </div>
 
             <div class="panel">
-                <div class="panel-title">小役カウント＆初当り記録</div>
+                <div class="panel-title">
+                    <span class="title-en">Count & Record</span>
+    <span class="title-jp">小役カウント＆初当り記録</span></div>
                 <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">「当選」を記録すると自動で履歴に保存され、カウンターがリセットされます。</div>
                 
                 <!-- 通常中 -->
@@ -478,7 +536,8 @@
                         <!-- CZ示唆入力 (通常時下部) -->
             <div class="panel">
                 <div class="panel-title">
-                    <span>CZ示唆 (通常時)</span>
+                    <span class="title-en">CZ Implications</span>
+    <span class="title-jp">CZランク示唆</span>
                     <button class="btn-info" onclick="showInfo('cz_sisa_info')">ⓘ</button>
                 </div>
                 <div class="input-row">
@@ -529,7 +588,8 @@
             <div class="panel" style="padding:0; overflow:hidden;">
                 <div style="padding:15px;">
                     <div class="panel-title">
-                        <span>CZ期待度推測ツール</span>
+                        <span class="title-en">Chance Zone</span>
+    <span class="title-jp">CZ期待度推測ツール</span>
                         <button class="btn-info" onclick="showInfo('cz_expect_info')">ⓘ</button>
                     </div>
                     <div class="input-row" style="margin-bottom:0;">
@@ -604,8 +664,10 @@
                         </div>
                         <div style="font-size:0.85rem; color:#555; margin-top:4px;" id="cz_live_exp_pt">期待所持pt: -- pt</div>
                         <div style="font-size:2.5rem; font-weight:bold; color:var(--blue);" id="cz_live_clear_prob">0.0%</div>
-                        <div style="font-size:1.1rem; font-weight:bold; color:var(--primary); margin-top:5px;" id="cz_live_expect">--</div>
+                        <div style="display: none;" id="cz_live_expect">--</div>                        
                         <div id="cz_live_rank_distribution" style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; font-size:0.85rem; color:#555; margin-top:5px;"></div>
+                            <div id="cz_congrats_msg">Congratulations!</div>
+
                     </div>
 
                     <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
@@ -618,21 +680,25 @@
 
             <!-- テーブル推測結果 -->
             <div class="panel">
-                <div class="panel-title">CZテーブル推測結果</div>
+                <div class="panel-title">
+                    <span class="title-en">CZ-Table</span>
+    <span class="title-jp">CZテーブル推測結果</span>
+    </div>
                 <div style="font-size:1.3rem; font-weight:bold; color:var(--blue); text-align:center; margin-bottom:10px;" id="cz_top_table_name">データ未入力</div>
                 <div id="cz_table_rank_list" style="display:flex; flex-direction:column; gap:4px; max-height:180px; overflow-y:auto; font-size:0.95rem;"></div>
             </div>
 
             <div class="panel">
                 <div class="panel-title">
-                    <span>テーブル推測 条件示唆</span>
+                    <span class="title-en">Config</span>
+    <span class="title-jp">テーブル推測設定</span>
                     <button class="btn-info" onclick="showInfo('cz_sisa_info')">ⓘ</button>
                 </div>
                 <label class="checkbox-label" style="margin-bottom:12px;">
                     <input type="checkbox" id="chk_cz_prev_fail" onchange="calcCzTable()"> 初回ボスバトル敗北 (テーブル10以上確定)
                 </label>
                 <label class="checkbox-label" style="margin-bottom:12px;">
-                    <input type="checkbox" id="chk_cz_morn" onchange="calcAll(); autoSave();"> 朝イチ状態 (設定推測に反映)
+                    <input type="checkbox" id="chk_cz_morn" onchange="calcAll(); autoSave();"> 推測したテーブルを設定推測に反映
                 </label>
                 <label class="checkbox-label" style="margin-bottom:12px;">
                     <input type="checkbox" id="chk_cz_table_weight" onchange="calcCzTable(); autoSave();"> テーブル選択率を考慮して推測 (独自仕様)
@@ -655,14 +721,20 @@
 
         <div id="cz-history-list-area" style="display:none;">
             <div class="panel">
-                <div class="panel-title">CZ履歴</div>
+                <div class="panel-title">
+                    <span class="title-en">CZ History</span>
+    <span class="title-jp">CZ履歴</span>
+    </div>
                 <div id="cz_history_list"></div>
             </div>
         </div>
 
         <div id="cz-history-area" style="display:none;">
             <div class="panel">
-                <div class="panel-title">CZテーブル履歴</div>
+                <div class="panel-title">
+                    <span class="title-en">CZ-Table History</span>
+    <span class="title-jp">CZテーブル履歴</span>
+    </div>
                 <div id="cz_table_history_list"></div>
             </div>
         </div>
@@ -670,7 +742,10 @@
     <!-- ===== タブ5: AT ===== -->
     <div id="tab-5" class="tab-content">
         <div class="panel">
-            <div class="panel-title">通常のAT終了画面カウント</div>
+            <div class="panel-title">
+                <span class="title-en">AT Endcard</span>
+    <span class="title-jp">AT終了画面</span>
+    </div>
             <div class="input-row"><span class="input-label">デフォルト</span>
                 <div class="counter-group"><button class="btn-calc" onclick="adjVal('at_0', -1)">-</button><div class="counter-val" id="val_at_0">0</div><button class="btn-calc" onclick="adjVal('at_0', 1)">+</button></div>
             </div>
@@ -756,7 +831,10 @@
             <div class="rank-list" id="res_rank_list"></div>
         </div>
         <div class="panel">
-            <div class="panel-title">推測要素一覧と個別判定</div>
+            <div class="panel-title">
+                <span class="title-en">Elements</span>
+    <span class="title-jp">推測要素一覧</span>
+    </div>
             <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">チェックを外すとその要素を推測計算から除外できます。</div>
             <div class="factor-list" id="factor-list"></div>
         </div>
@@ -765,7 +843,10 @@
     <!-- ===== タブ7: その他 ===== -->
     <div id="tab-7" class="tab-content">
         <div class="panel">
-            <div class="panel-title">データのバックアップ・復元</div>
+            <div class="panel-title">
+                <span class="title-en">Save / Load</span>
+    <span class="title-jp">データのセーブ・ロード</span>
+    </div>
             <div style="font-size:0.85rem; color:#666; margin-bottom:10px;">
                 アプリは自動でセーブされていますが、ファイルとして外部に保存・読み込みが可能です。
             </div>
@@ -778,7 +859,10 @@
         </div>
 
         <div class="panel">
-            <div class="panel-title">謎挙動</div>
+            <div class="panel-title">
+                <span class="title-en">Mysterious behavior</span>
+    <span class="title-jp">謎挙動</span>
+    </div>
             <div style="font-size:0.85rem; color:#666; margin-bottom:10px;">
                 ※この要素は設定推測の計算には含まれません
             </div>
@@ -804,7 +888,10 @@
         </div>
 
         <div class="panel">
-            <div class="panel-title">メモ欄</div>
+            <div class="panel-title">
+                <span class="title-en">Memo</span>
+    <span class="title-jp">メモ欄</span>
+    </div>
             <textarea id="memo_text" class="memo-box" placeholder="実践中に気になった挙動などを自由に書き込めます" onchange="autoSave()"></textarea>
         </div>
     </div>
@@ -854,7 +941,10 @@
         </div>
 
         <div class="panel">
-            <div class="panel-title">バトル履歴</div>
+            <div class="panel-title">
+                <span class="title-en">Battle History</span>
+    <span class="title-jp">バトル履歴</span>
+    </div>
             <div id="battle_history_area"></div>
         </div>
     </div>
@@ -942,6 +1032,13 @@
                 </select>
             </div>
         </div>
+        
+        <div class="input-row" id="edit_ignore_row" style="border-top:1px dashed #ccc; padding-top:10px; margin-top:10px;">
+            <span class="input-label" style="color:var(--accent);">ランク昇格扱い</span>
+            <label class="checkbox-label" style="padding:5px; border:none; background:none; font-size:0.9rem;">
+                <input type="checkbox" id="edit_cz_ignore"> 推測から除外する
+            </label>
+        </div>
 
         <!-- 朝イチフラグ関連 -->
         <div class="input-row" id="edit_is_morn_row" style="display:none; border-top:1px dashed #ccc; padding-top:10px; margin-top:10px;">
@@ -951,7 +1048,7 @@
             </label>
         </div>
         <div class="input-row" id="edit_is_cz_morn_row" style="display:none; border-top:1px dashed #ccc; padding-top:10px; margin-top:10px;">
-            <span class="input-label" style="color:var(--blue);">朝イチテーブル</span>
+            <span class="input-label" style="color:var(--blue);">テーブル設定推測</span>
             <label class="checkbox-label" style="padding:5px; border:none; background:none; font-size:0.9rem;">
                 <input type="checkbox" id="edit_is_cz_morn"> 推測に反映
             </label>
@@ -1934,6 +2031,31 @@ function processHit() {
     }
 
     let isMornData = document.getElementById("chk_cz_morn") ? document.getElementById("chk_cz_morn").checked : false;
+
+    // --- 追加：直撃時にランクDの可能性があれば、Dとして推測を絞る ---
+    let isDirectBonus = (pendingHit.res1 === 'bonus' || pendingHit.res1 === 'bonus_tenjo' || pendingHit.res1 === 'bonus_morn');
+    if (isDirectBonus && czThruData[currCzThru]) {
+        let hasDPossibility = false;
+        if (window.currentCzTableProbs) {
+            // 現在の推測結果を見て、今のスルー回が「D」になるテーブルが残っているかチェック
+            for (let t = 1; t <= 12; t++) {
+                if (window.currentCzTableProbs[t] > 0 && CZ_TABLES[t][currCzThru] === 'D') {
+                    hasDPossibility = true;
+                    break;
+                }
+            }
+        }
+        if (hasDPossibility) {
+            // 一時的にランクDでの当選扱いとしてテーブルを再計算し、推測を絞り込む
+            czThruData[currCzThru].res = 'direct';
+            calcCzTable(); 
+            } else {
+            // ★追加：ランクDの可能性が消滅している状態での直撃なら、CZランク昇格に自動で+1
+            changeCounter('cz_up', 1);
+        }
+    }
+    // -------------------------------------------------------------
+
     let currentCzLog = null;
     if (czThruData[currCzThru] && czThruData[currCzThru].res !== 'none') {
         currentCzLog = JSON.parse(JSON.stringify(czThruData[currCzThru]));
@@ -2075,12 +2197,14 @@ function openEditHist(idx) {
         document.getElementById("edit_cz_bell").value = h.czLog.bell || 0;
         document.getElementById("edit_cz_weak").value = h.czLog.weak || 0;
         document.getElementById("edit_cz_strong").value = h.czLog.strong || 0;
+        document.getElementById("edit_cz_ignore").checked = h.czLog.ignore || false;
     } else {
         document.getElementById("edit_cz_type").value = 'sao';
         document.getElementById("edit_cz_lamp").value = 'none';
         document.getElementById("edit_cz_bell").value = 0;
         document.getElementById("edit_cz_weak").value = 0;
         document.getElementById("edit_cz_strong").value = 0;
+        document.getElementById("edit_cz_ignore").checked = false;
     }
     
     toggleEditDetail();
@@ -2111,6 +2235,41 @@ function saveHistEdit() {
     }
 
     if (!h.czLog) h.czLog = {};
+    
+        // ▼▼▼ 修正：除外状態の保存と、計算データへの完全同期 ▼▼▼
+    let nIgnore = document.getElementById("edit_cz_ignore").checked;
+    let oldIgnore = h.czLog.ignore || false;
+    h.czLog.ignore = nIgnore;
+
+    if (oldIgnore !== nIgnore) {
+        if (nIgnore) {
+            changeCounter('cz_up', 1);
+        } else {
+            changeCounter('cz_up', -1);
+        }
+    }
+
+    // 編集した履歴が「過去に終わった区間」ではなく「現在進行中のCZ区間」のものか判定
+    let isNowSegment = true;
+    for (let i = 0; i < idx; i++) {
+        if (historyLog[i].res1 !== 'cz_fail') {
+            isNowSegment = false;
+            break;
+        }
+    }
+
+    // 現在進行中の区間なら、裏側の計算データも強制的に同期させる
+    if (isNowSegment && h.thrus !== undefined && czThruData[h.thrus]) {
+        czThruData[h.thrus].ignore = nIgnore;
+        
+        // もし今画面で開いているスルー回と編集した履歴が同じなら、画面のチェックボックスも連動させる
+        if (h.thrus === currCzThru) {
+            let uiIgnore = document.getElementById("chk_ignore_infer");
+            if (uiIgnore) uiIgnore.checked = nIgnore;
+        }
+    }
+    // ▲▲▲ ここまで修正 ▲▲▲
+
 
     if (n1 === 'cz_fail' || n1 === 'cz_ok') {
         h.czLog.type = document.getElementById("edit_cz_type").value;
@@ -2142,6 +2301,7 @@ function saveHistEdit() {
                 czThruData[h.thrus].bell = h.czLog.bell;
                 czThruData[h.thrus].weak = h.czLog.weak;
                 czThruData[h.thrus].strong = h.czLog.strong;
+                czThruData[h.thrus].ignore = nIgnore;
             }
         }
     }
@@ -2165,6 +2325,9 @@ function saveHistEdit() {
             if(cmChk) cmChk.checked = false; 
         }
     }
+    
+    
+    recalculateHistorySegmentRanks(idx);
 
     closeModals();
     renderScenHistory();
@@ -2208,6 +2371,7 @@ function renderCzHistoryList() {
             }
 
             let gInfo = h.addG > 0 ? `<span style="margin-left:8px; font-size:0.9rem; color:var(--blue); font-weight:bold;">(+${h.addG}G)</span>` : "";
+            let ignoreInfo = log.ignore ? `<span style="margin-left:8px; font-size:0.85rem; color:#ed8936; font-weight:bold;">[推測除外]</span>` : "";
 
             html += `<div style="background:#fff; border:1px solid #ddd; padding:12px; margin-bottom:10px; border-radius:6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                 <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#666; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px;">
@@ -2220,7 +2384,7 @@ function renderCzHistoryList() {
                     <span>弱レア: ${log.weak || 0}</span>
                     <span>強レア: ${log.strong || 0}</span>
                 </div>
-                <div style="font-weight:bold; margin-top:8px; color:#555;">結果: <span style="color:${resCol};">${resText}</span>${gInfo}</div>
+                <div style="font-weight:bold; margin-top:8px; color:#555;">結果: <span style="color:${resCol};">${resText}</span>${gInfo}${ignoreInfo}</div>
                 ${detailHtml}
             </div>`;
         });
@@ -2283,6 +2447,7 @@ function renderScenHistory() {
             }
 
             let gInfo = h.addG > 0 ? `<span style="margin-left:8px; font-size:0.9rem; color:var(--blue); font-weight:bold;">(+${h.addG}G)</span>` : "";
+            let ignoreInfo = (h.czLog && h.czLog.ignore) ? `<span style="margin-left:8px; font-size:0.85rem; color:#ed8936; font-weight:bold;">[除外済]</span>` : "";
 
             html += `<div style="background:#fff; border:1px solid #ddd; padding:12px; margin-bottom:10px; border-radius:6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                 <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#666; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px;">
@@ -2291,7 +2456,7 @@ function renderScenHistory() {
                 </div>
                 <div style="font-weight:bold; font-size:1.1rem; color:#666;">シナリオ: ${h.scenTopName} (${h.scenTopProb})</div>
                 ${subsHtml}
-                <div style="font-weight:bold; margin-top:8px; color:#555;">結果: <span style="color:var(--accent);">${triggerInfo}${resText}</span>${gInfo}</div>
+                <div style="font-weight:bold; margin-top:8px; color:#555;">結果: <span style="color:var(--accent);">${triggerInfo}${resText}</span>${gInfo}${ignoreInfo}</div>
             </div>`;
         });
         html += `<button class="modal-btn danger" style="margin-top:20px;" onclick="if(confirm('履歴を全て削除しますか？(テーブル履歴も削除されます)')) { historyLog=[]; renderScenHistory(); renderCzTableHistory(); renderCzHistoryList(); calcAll(); calcCzTable(); autoSave(); }">履歴を全削除</button>`;
@@ -2339,6 +2504,8 @@ function renderCzTableHistory() {
                 subsHtml += `</div>`;
             }
 
+            let ignoreInfo = (h.czLog && h.czLog.ignore) ? `<span style="margin-left:8px; font-size:0.85rem; color:#ed8936; font-weight:bold;">[推測除外]</span>` : "";
+            
             html += `<div style="background:#fff; border:1px solid #ddd; padding:12px; margin-bottom:10px; border-radius:6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                 <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#666; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px;">
                     <span>${dStr}</span>
@@ -2346,7 +2513,7 @@ function renderCzTableHistory() {
                 </div>
                 <div style="font-weight:bold; font-size:1.1rem; color:#444;">${h.czTopName || 'データなし'}</div>
                 ${subsHtml}
-                <div style="font-weight:bold; margin-top:8px; color:#555;">結果: <span style="color:var(--accent);">${resText}</span></div>
+                <div style="font-weight:bold; margin-top:8px; color:#555;">結果: <span style="color:var(--accent);">${resText}</span>${ignoreInfo}</div>
             </div>`;
         });
         html += `<button class="modal-btn danger" style="margin-top:20px;" onclick="if(confirm('履歴を全て削除しますか？(シナリオ履歴も削除されます)')) { historyLog=[]; renderCzTableHistory(); renderScenHistory(); calcAll(); calcCzTable(); autoSave(); }">履歴を全削除</button>`;
@@ -2589,6 +2756,8 @@ function calcCzTable() {
 
     let sum = 0;
     for(let t=1; t<=12; t++) sum += scores[t];
+    if (window.isSilentCalc) return scores;
+
 
     window.currentCzTableProbs = {};
     for(let t=1; t<=12; t++) window.currentCzTableProbs[t] = (sum > 0 && scores[t] > 0) ? (scores[t] / sum) : 0;
@@ -2598,9 +2767,24 @@ function calcCzTable() {
 
     if(!topNameEl || !rankListEl) return;
 
-    if(sum === 0) {
+    let sorted = [];
+    if (sum > 0) {
+        for(let t=1; t<=12; t++) {
+            if(scores[t] > 0) sorted.push({ t: t, p: scores[t] / sum });
+        }
+        sorted.sort((a,b) => b.p - a.p);
+    }
+
+    // 「sumが0」または「エラー等で条件に合うテーブルが0個になった」場合は矛盾処理
+    if(sum === 0 || sorted.length === 0) {
         topNameEl.innerText = "矛盾あり（判定不能）";
-        rankListEl.innerHTML = "<div style='color:#999; text-align:center; padding:10px;'>条件に合うテーブルがありません。入力を見直してください。</div>";
+        rankListEl.innerHTML = `
+            <div style='color:#e53e3e; font-size:0.9rem; text-align:center; padding:10px 5px 5px 5px;'>
+                条件に合うテーブルが消滅しました。<br>
+                <span style="font-size:0.8rem; color:#666;">(入力ミス、またはCZランク昇格の可能性があります)</span>
+            </div>
+            <button class="btn-hit" style="background:#ed8936; width:100%; padding:10px; margin-top:5px; font-size:1rem;" onclick="autoIgnoreCz()">ランク昇格として推測から除外</button>
+        `;
         updateLiveExpect(null, 0);
         let elNextCz = document.getElementById("disp_next_cz_expect");
         if (elNextCz) elNextCz.innerText = "--%";
@@ -2608,17 +2792,11 @@ function calcCzTable() {
         if (elNextRankProbs) elNextRankProbs.innerHTML = "";
         isNextDConfirm = false;
         calcAll();
-        return;
+        return; 
     }
-
-    let sorted = [];
-    for(let t=1; t<=12; t++) {
-        if(scores[t] > 0) sorted.push({ t: t, p: scores[t] / sum });
-    }
-    sorted.sort((a,b) => b.p - a.p);
 
     topNameEl.innerText = `現在の最有力: テーブル ${sorted[0].t} (${(sorted[0].p * 100).toFixed(1)}%)`;
-
+    
     let html = "";
     sorted.forEach(item => {
         let pct = (item.p * 100).toFixed(1);
@@ -2657,6 +2835,7 @@ function calcCzTable() {
                 }
             }
             elNextCz.innerText = (nextExpect * 100).toFixed(1) + "%";
+            let stickyCz = document.getElementById("sticky_val_cz"); if(stickyCz) stickyCz.innerText = (nextExpect * 100).toFixed(1) + "%";
             
             // 【追加】各ランクの選択確率を描画する
             if (elNextRankProbs) {
@@ -2670,7 +2849,18 @@ function calcCzTable() {
         }
     }
 
-    calcAll();
+let congratsMsg = document.getElementById("cz_congrats_msg");
+    let probEl = document.getElementById("cz_live_clear_prob"); // %が表示されている箱を取得
+    
+    if (congratsMsg && probEl) {
+        // 箱の中の文字（innerText）が "100.0%" または "100%" かどうかをチェック
+        if (probEl.innerText === "100.0%" || probEl.innerText === "100%") {
+            congratsMsg.style.display = "block";
+        } else {
+            congratsMsg.style.display = "none";
+        }
+    }
+        calcAll();
     autoSave();
 }
 
@@ -3155,6 +3345,7 @@ function calcAll() {
         
         let tp = (sRes[0].p * 100).toFixed(1) + "%";
         let elScenTopName = document.getElementById("scen_top_name"); if(elScenTopName) elScenTopName.innerText = sRes[0].s;
+        let stickyScen = document.getElementById("sticky_val_scen"); if(stickyScen) stickyScen.innerText = sRes[0].s;
         let elScenTopProb = document.getElementById("scen_top_prob"); if(elScenTopProb) elScenTopProb.innerText = tp;
         let elScenTopLv = document.getElementById("scen_top_lv"); if(elScenTopLv) elScenTopLv.innerText = `Lv.${SCEN_LVL[sRes[0].s][currScenTab]}`;
 
@@ -3169,6 +3360,7 @@ function calcAll() {
     } else {
         currentScenRes = [];
         let elScenTopName = document.getElementById("scen_top_name"); if(elScenTopName) elScenTopName.innerText = "判定不能";
+        let stickyScen = document.getElementById("sticky_val_scen"); if(stickyScen) stickyScen.innerText = "--";
         let elScenTopProb = document.getElementById("scen_top_prob"); if(elScenTopProb) elScenTopProb.innerText = "-%";
         let elScenTopLv = document.getElementById("scen_top_lv"); if(elScenTopLv) elScenTopLv.innerText = "--";
         let elScenRankList = document.getElementById("scen_rank_list"); if(elScenRankList) elScenRankList.innerHTML = "";
@@ -3649,6 +3841,7 @@ if(document.getElementById("chk_cz_table_weight")) document.getElementById("chk_
 
     resetScenTabs();
     switchScenTab(0);
+    switchCzMainTab(0);
     renderScenHistory();
 
     initCzTable();
@@ -4017,39 +4210,52 @@ function calcSettings(tStats, cbG, nrmG) {
     let dispTableTrans = document.getElementById("disp_cz_table_trans");
     if(dispTableTrans) dispTableTrans.innerHTML = tableHtml;
 
-    // 【修正】朝イチCZテーブルの推測要素を「履歴」と「現在」の両方から計算して追加する
-    let isCzMorn = document.getElementById("chk_cz_morn") ? document.getElementById("chk_cz_morn").checked : false;
-    let hasMornTable = false;
-    let mornScores = [0,0,0,0,0,0];
+        // ▼▼▼ 修正：CZテーブル推測の合算処理 ▼▼▼
+    let combinedTableScores = [1, 1, 1, 1, 1, 1];
+    let hasTableData = false;
 
-    if (isCzMorn && window.currentCzTableProbs) {
-        hasMornTable = true;
+    // ① 現在進行中の推測データを計算（メイン画面のチェックがオンの時のみ）
+    let isCurrentIncluded = document.getElementById("chk_cz_morn") ? document.getElementById("chk_cz_morn").checked : false;
+    if (isCurrentIncluded && window.currentCzTableProbs) {
+        let currentScores = [0,0,0,0,0,0];
         for(let s=0; s<6; s++) {
-            for(let t=1; t<=12; t++) { mornScores[s] += window.currentCzTableProbs[t] * DAT.cz_table_morn[t][s]; }
+            for(let t=1; t<=12; t++) {
+                currentScores[s] += window.currentCzTableProbs[t] * DAT.cz_table_morn[t][s];
+            }
+        }
+        let cSum = currentScores.reduce((a,b)=>a+b,0);
+        if (cSum > 0) {
+            for(let s=0; s<6; s++) combinedTableScores[s] *= currentScores[s];
+            hasTableData = true;
         }
     }
 
+    // ② 履歴の編集画面で「合算に含める」のチェックが入っている履歴だけを計算して掛け合わせる
     if (historyLog && historyLog.length > 0) {
-        historyLog.forEach((h, idx) => {
+        historyLog.forEach((h) => {
             if (h.res1 !== 'cz_fail' && h.isCzMorn && h.czRanks && h.czRanks.length > 0) {
-                let hMornScores = [0,0,0,0,0,0];
+                let hScores = [0,0,0,0,0,0];
                 let tableProbs = {};
                 h.czRanks.forEach(r => tableProbs[r.t] = r.p);
                 for(let s=0; s<6; s++) {
                     for(let t=1; t<=12; t++) {
-                        if (tableProbs[t] !== undefined) hMornScores[s] += tableProbs[t] * DAT.cz_table_morn[t][s];
+                        if (tableProbs[t] !== undefined) hScores[s] += tableProbs[t] * DAT.cz_table_morn[t][s];
                     }
                 }
-                let mSum = hMornScores.reduce((a,b)=>a+b,0);
-                if (mSum > 0) addFactor(`cz_morn_table_hist_${idx}`, `朝イチCZテーブル (履歴)`, hMornScores, false);
+                let mSum = hScores.reduce((a,b)=>a+b,0);
+                if (mSum > 0) {
+                    for(let s=0; s<6; s++) combinedTableScores[s] *= hScores[s];
+                    hasTableData = true;
+                }
             }
         });
     }
 
-    if (hasMornTable) {
-        let mSum = mornScores.reduce((a,b)=>a+b,0);
-        if (mSum > 0) addFactor('cz_morn_table_current', '朝イチCZテーブル (現在)', mornScores, false);
+    // ③ まとめて「1つの項目」として設定推測タブ(タブ6)に出力
+    if (hasTableData) {
+        addFactor('cz_table_all', 'CZテーブル推測 (合算)', combinedTableScores, false);
     }
+    // ▲▲▲ ここまで書き換え ▲▲▲
 
     let atSum = V.at_0 + V.at_1 + V.at_2 + V.at_3 + V.at_4 + V.at_5;
     let atArr = [1,1,1,1,1,1]; let hasAt = false;
@@ -4100,6 +4306,190 @@ function calcSettings(tStats, cbG, nrmG) {
         listEl.innerHTML = rHtml;
     }
 }
+
+// ▼▼ スクロール連動処理 ▼▼
+window.addEventListener("scroll", function() {
+    let bar = document.getElementById("sticky_scen_bar");
+    let subTabs = document.getElementById("sub-tabs"); 
+    let isTab3Active = document.getElementById("tab-3") && document.getElementById("tab-3").classList.contains("active");
+    
+    if(!bar) return;
+    
+    // スクロール量が180pxを超えたら、ミニバーを表示してサブタブを押し下げる
+    if (isTab3Active && window.scrollY > 180) {
+        bar.style.display = "flex";
+        if(subTabs) subTabs.style.top = "84px"; 
+    } else {
+        bar.style.display = "none";
+        if(subTabs) subTabs.style.top = "50px";
+    }
+});
+
+// ▼▼▼ 追加：スマート自動レスキュー関数（ランク推論搭載版＋履歴同期対応） ▼▼▼
+function autoIgnoreCz() {
+    let candidates = [];
+    window.isSilentCalc = true;
+
+    for (let i = 0; i <= currCzThru; i++) {
+        if (czThruData[i] && !czThruData[i].ignore) {
+            czThruData[i].ignore = true;
+            let tempScores = calcCzTable();
+            
+            let validTables = [];
+            for (let t = 1; t <= 12; t++) {
+                if (tempScores && tempScores[t] > 0) validTables.push(t);
+            }
+            
+            if (validTables.length > 0) {
+                let isRankUp = false;
+                for (let t of validTables) {
+                    let baseRank = CZ_TABLES[t][i];
+                    if (baseRank === 'A' || baseRank === 'B') {
+                        isRankUp = true;
+                        break;
+                    }
+                }
+                candidates.push({ idx: i, isRankUp: isRankUp });
+            }
+            czThruData[i].ignore = false;
+        }
+    }
+    
+    window.isSilentCalc = false;
+
+    if (candidates.length > 0) {
+        let bestCandidates = candidates.filter(c => c.isRankUp);
+        if (bestCandidates.length === 0) bestCandidates = candidates;
+        bestCandidates.sort((a, b) => a.idx - b.idx);
+        let targetIdx = bestCandidates[0].idx;
+        
+        // ① 現在進行中のデータを除外
+        czThruData[targetIdx].ignore = true;
+        changeCounter('cz_up', 1);
+        
+        // ② 【追加】すでに保存された履歴データ（historyLog）にも除外フラグを同期する
+        for (let j = 0; j < historyLog.length; j++) {
+            let h = historyLog[j];
+            // ターゲットのスルー回と同じ履歴を見つけたらフラグを立てる
+            if (h.thrus === targetIdx && h.czLog) {
+                h.czLog.ignore = true;
+                break;
+            }
+            // 別の区間（過去のAT当選など）まで遡ってしまったらストップ
+            // (※ただし最新の履歴 j=0 が直撃などの当選履歴だった場合は直下を調べるためスルー)
+            if (h.res1 !== 'cz_fail' && j > 0) {
+                break;
+            }
+        }
+
+        // ③ 【追加】履歴リストを即座に再描画して「[推測除外]」バッジを表示させる
+        if (typeof renderCzHistoryList === "function") renderCzHistoryList();
+        if (typeof renderCzTableHistory === "function") renderCzTableHistory();
+        if (typeof renderScenHistory === "function") renderScenHistory();
+        
+        // ④ 画面の更新処理
+        if (currCzThru !== targetIdx) {
+            switchCzThruTab(targetIdx);
+        } else {
+            calcCzTable();
+        }
+        autoSave();
+        alert(targetIdx + "スルー目の挙動を「ランク昇格(対象外)」として処理し、矛盾を解消しました！");
+    } else {
+        calcCzTable();
+        alert("自動解決できませんでした。ボイスやランプ色に複数の入力ミスがないか確認してください。");
+    }
+}
+
+
+// ▼▼▼ 追加：履歴編集時に過去のテーブル推測を再計算する関数 ▼▼▼
+function recalculateHistorySegmentRanks(historyIdx) {
+    let endIdx = historyIdx;
+    // 編集した箇所から「その区間の終わり（ボーナスやCZ成功）」を探す
+    while (endIdx > 0 && historyLog[endIdx].res1 === 'cz_fail') {
+        endIdx--;
+    }
+    
+    // 区間がまだ終わっていない（現在進行中のラウンド）場合は、現在のテーブルを再計算して終了
+    if (historyLog[endIdx].res1 === 'cz_fail') {
+        calcCzTable();
+        return;
+    }
+
+    // 区間の始まり（0スルー目）を探す
+    let startIdx = endIdx;
+    while (startIdx + 1 < historyLog.length && historyLog[startIdx + 1].res1 === 'cz_fail') {
+        startIdx++;
+    }
+
+    // 過去のCZ履歴データを復元
+    let tempThruData = [];
+    for(let i=0; i<7; i++) tempThruData.push({res:'none', ignore:false});
+    
+    let cThru = 0;
+    for (let i = startIdx; i >= endIdx; i--) {
+        let h = historyLog[i];
+        if (h.czLog) tempThruData[cThru] = JSON.parse(JSON.stringify(h.czLog));
+        if (i === endIdx) {
+            tempThruData[cThru].res = (h.res1 === 'cz_ok') ? 'success' : 'direct';
+        } else {
+            tempThruData[cThru].res = 'fail';
+            cThru++;
+        }
+    }
+
+    // 現在の画面の状態を一時退避
+    let backupData = JSON.parse(JSON.stringify(czThruData));
+    let backupThru = currCzThru;
+    let backupMode = isCzMode;
+
+    // 過去のデータに入れ替えて、裏側でテスト計算モードをオン
+    czThruData = tempThruData;
+    currCzThru = cThru;
+    isCzMode = false;
+    window.isSilentCalc = true;
+
+    // 今の画面の入力状態が過去の計算に混ざらないよう、一時的にクリア
+    let elFlash = document.getElementById("norm_flash"); let bFlash = elFlash ? elFlash.value : "none"; if(elFlash) elFlash.value = "none";
+    let elCoral = document.getElementById("norm_coral"); let bCoral = elCoral ? elCoral.checked : false; if(elCoral) elCoral.checked = false;
+    let elVoice = document.getElementById("norm_voice"); let bVoice = elVoice ? elVoice.value : "none"; if(elVoice) elVoice.value = "none";
+    let elLinders = document.getElementById("norm_linders"); let bLinders = elLinders ? elLinders.checked : false; if(elLinders) elLinders.checked = false;
+    let elPrevFail = document.getElementById("chk_cz_prev_fail"); let bPrevFail = elPrevFail ? elPrevFail.checked : false; if(elPrevFail) elPrevFail.checked = false;
+    let elAtVoice = document.getElementById("sel_cz_at_voice"); let bAtVoice = elAtVoice ? elAtVoice.value : "none"; if(elAtVoice) elAtVoice.value = "none";
+
+    // 計算実行！
+    let scores = calcCzTable();
+
+    // 画面の入力状態を元に戻す
+    if(elFlash) elFlash.value = bFlash;
+    if(elCoral) elCoral.checked = bCoral;
+    if(elVoice) elVoice.value = bVoice;
+    if(elLinders) elLinders.checked = bLinders;
+    if(elPrevFail) elPrevFail.checked = bPrevFail;
+    if(elAtVoice) elAtVoice.value = bAtVoice;
+
+    // グローバル変数を元に戻す
+    czThruData = backupData;
+    currCzThru = backupThru;
+    isCzMode = backupMode;
+    window.isSilentCalc = false;
+
+    // 計算結果を履歴データに上書き保存
+    let sum = 0;
+    for(let t=1; t<=12; t++) sum += scores[t];
+    let newRanks = [];
+    if (sum > 0) {
+        for(let t=1; t<=12; t++) {
+            if (scores[t] > 0) newRanks.push({t: t, p: scores[t]/sum});
+        }
+        newRanks.sort((a,b) => b.p - a.p);
+        historyLog[endIdx].czTopName = `現在の最有力: テーブル ${newRanks[0].t} (${(newRanks[0].p * 100).toFixed(1)}%)`;
+    } else {
+        historyLog[endIdx].czTopName = "矛盾あり（判定不能）";
+    }
+    historyLog[endIdx].czRanks = newRanks;
+}
+
 
 </script>
 </body>
