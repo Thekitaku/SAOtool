@@ -115,8 +115,19 @@
         .factor-list { margin-top: 15px; }
         .factor-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 0.9rem; }
         
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #fff; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        /* ▼ アニメーションの定義を追加 ▼ */
+        @keyframes bgFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        @keyframes popupAnim {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        /* ▼ 既存の枠に animation を追加 ▼ */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; animation: bgFadeIn 0.2s ease-out forwards; }
+        .modal-content { background: #fff; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; animation: popupAnim 0.25s ease-out forwards; }
+
         .modal-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; text-align: center; color: var(--accent); }
         .modal-btn { display: block; width: 100%; padding: 12px; margin-bottom: 10px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; box-sizing:border-box;}
         .modal-btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
@@ -150,13 +161,30 @@
         margin-top: 15px;
         display: none;
     }
+    
+            /* ▼ 100%用の虹色枠アニメーション ▼ */
+        @keyframes boxRainbow {
+            0% { border-color: #ff0000; box-shadow: 0 0 8px rgba(255,0,0,0.5); }
+            14% { border-color: #ff7f00; box-shadow: 0 0 8px rgba(255,127,0,0.5); }
+            28% { border-color: #ffff00; box-shadow: 0 0 8px rgba(255,255,0,0.5); }
+            42% { border-color: #00ff00; box-shadow: 0 0 8px rgba(0,255,0,0.5); }
+            57% { border-color: #0000ff; box-shadow: 0 0 8px rgba(0,0,255,0.5); }
+            71% { border-color: #4b0082; box-shadow: 0 0 8px rgba(75,0,130,0.5); }
+            85% { border-color: #8b00ff; box-shadow: 0 0 8px rgba(139,0,255,0.5); }
+            100% { border-color: #ff0000; box-shadow: 0 0 8px rgba(255,0,0,0.5); }
+        }
+        .box-rainbow {
+            animation: boxRainbow 3s linear infinite !important;
+            background: #fff5f5 !important;
+        }
+
 
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="position: relative;">SLOT Sword Art Online<br> Estimation Tool<span style="position: absolute; right: 5px; bottom: 0; font-size: 0.8rem; color: #888; font-weight: normal; margin-left: 5px;">(v2.1.0)</span></h1>
+    <h1 style="position: relative;">SLOT Sword Art Online<br> Estimation Tool<span style="position: absolute; right: 5px; bottom: 0; font-size: 0.8rem; color: #888; font-weight: normal; margin-left: 5px;">(v2.2.1)</span></h1>
 
     <div class="main-tabs">
         <button class="m-tab-btn active" onclick="switchMainTab(1)">小役･初当り</button>
@@ -175,6 +203,7 @@
             <div class="panel-title">
     <span class="title-en">Games</span>
     <span class="title-jp">G数入力</span>
+    <button class="btn-info" onclick="showInfo('games_info')">ⓘ</button>
 </div>
 
             <div class="input-row">
@@ -658,17 +687,18 @@
                         </div>
                     </div>
                     
-                    <div style="text-align:center; background:#ebf8ff; padding:15px; border-radius:8px; border:2px solid var(--blue); margin-bottom:15px;">
-                        <div style="font-size:0.9rem; color:#3182ce; font-weight:bold; display:flex; justify-content:center; align-items:center; gap:8px;">
+                                        <!-- ▼ IDとトランジションを追加 ▼ -->
+                    <div id="cz_live_expect_box" style="text-align:center; background:#ebf8ff; padding:15px; border-radius:8px; border:2px solid var(--blue); margin-bottom:15px; transition: all 0.3s ease;">
+                        <div id="cz_live_expect_title" style="font-size:0.9rem; color:#3182ce; font-weight:bold; display:flex; justify-content:center; align-items:center; gap:8px; transition: color 0.3s ease;">
                             ボーナス当選期待度 (16pt到達率)
                         </div>
                         <div style="font-size:0.85rem; color:#555; margin-top:4px;" id="cz_live_exp_pt">期待所持pt: -- pt</div>
-                        <div style="font-size:2.5rem; font-weight:bold; color:var(--blue);" id="cz_live_clear_prob">0.0%</div>
+                        <div id="cz_live_clear_prob" style="font-size:2.5rem; font-weight:bold; color:var(--blue); transition: color 0.3s ease;">0.0%</div>
                         <div style="display: none;" id="cz_live_expect">--</div>                        
                         <div id="cz_live_rank_distribution" style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; font-size:0.85rem; color:#555; margin-top:5px;"></div>
-                            <div id="cz_congrats_msg">Congratulations!</div>
-
+                            <div id="cz_congrats_msg">Congratulations!!</div>
                     </div>
+
 
                     <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
                         <button class="btn-hit" style="flex:1; background:#718096; padding:12px; font-size:1rem;" onclick="openCzFailVoiceModal()">CZ失敗を記録</button>
@@ -692,7 +722,7 @@
                 <div class="panel-title">
                     <span class="title-en">Config</span>
     <span class="title-jp">テーブル推測設定</span>
-                    <button class="btn-info" onclick="showInfo('cz_sisa_info')">ⓘ</button>
+                    <button class="btn-info" onclick="showInfo('table_morn')">ⓘ</button>
                 </div>
                 <label class="checkbox-label" style="margin-bottom:12px;">
                     <input type="checkbox" id="chk_cz_prev_fail" onchange="calcCzTable()"> 初回ボスバトル敗北 (テーブル10以上確定)
@@ -1123,6 +1153,29 @@
 </div>
 
 <!-- 隠し確率データ -->
+
+<div id="info_games_info" style="display:none;">
+    <h4 style="margin:5px 0;font-size:0.9rem;color:var(--blue);">総通常G数</h4>
+    <p style="font-size:0.8rem; margin-top:0; margin-bottom:10px; line-height:1.4;">
+        以下の出現率・確率計算の分母として使用されます。<br>
+        ・CZ出現率<br>
+        ・ボーナス初当り確率<br>
+        ・謎当たり確率
+    </p>
+    <h4 style="margin:5px 0;font-size:0.9rem;color:var(--blue);">ダイトモG数</h4>
+    <p style="font-size:0.8rem; margin-top:0; margin-bottom:10px; line-height:1.4;">
+        以下の出現率計算の分母として使用されます。<br>
+        ・共通ベル出現率<br>
+        <span style="color:#666;">※ダイトモの「通常プレイ数」を入力してください。</span>
+    </p>
+    <h4 style="margin:5px 0;font-size:0.9rem;color:var(--blue);">ボーナス間G数</h4>
+    <p style="font-size:0.8rem; margin-top:0; margin-bottom:10px; line-height:1.4;">
+        設定推測の確率計算には影響しません。<br>
+        当選記録ボタンを押した際に「天井直撃」の選択肢を自動表示させるための判定用として使用されます。
+    </p>
+</div>
+
+
 <div id="info_main_count" style="display:none;">
     <table class="info-table">
         <tr><th>設定</th><th>共通ベル</th><th>CZ</th><th>ボーナス</th></tr>
@@ -1296,6 +1349,12 @@
         ・<strong>黄</strong>：4pt以上の期待度 60%<br>
         ・<strong>緑</strong>：4pt以上確定<br>
         ・<strong>赤</strong>：6pt以上確定 ＋ 8pt以上の期待度 70%
+    </p>
+    <h4 style="margin:10px 0 5px;font-size:0.9rem;">アスナとクッキングデートチャンス ランプ色ごとのpt示唆</h4>
+    <p style="font-size:0.8rem; text-align:left; margin:0 5px; line-height:1.4;">
+        ・<strong>黄</strong>：基本パターン<br>
+        ・<strong>緑</strong>：8pt以上確定<br>
+        ・<strong>赤</strong>：10pt以上確定
     </p>
 </div>
 
@@ -2879,6 +2938,45 @@ function convDist(d1, d2) {
     return res.slice(0, maxIdx+1);
 }
 
+function updateExpectBoxColor(pct) {
+    let boxEl = document.getElementById("cz_live_expect_box");
+    let titleEl = document.getElementById("cz_live_expect_title");
+    let probEl = document.getElementById("cz_live_clear_prob");
+    
+    if(!boxEl || !titleEl || !probEl) return;
+    
+    boxEl.className = "";
+    probEl.classList.remove("setting-rainbow");
+    
+    if (pct >= 99.9) { // 100%
+        boxEl.classList.add("box-rainbow");
+        titleEl.style.color = "#ff3333";
+        probEl.classList.add("setting-rainbow");
+        probEl.style.color = "";
+    } else if (pct >= 80) {
+        boxEl.style.borderColor = "var(--accent)";
+        boxEl.style.background = "#fff5f5";
+        titleEl.style.color = "var(--accent)";
+        probEl.style.color = "var(--accent)";
+    } else if (pct >= 60) {
+        boxEl.style.borderColor = "var(--green)";
+        boxEl.style.background = "#f0fff4";
+        titleEl.style.color = "var(--green)";
+        probEl.style.color = "var(--green)";
+    } else if (pct >= 40) {
+        boxEl.style.borderColor = "#d69e2e";
+        boxEl.style.background = "#fffff0";
+        titleEl.style.color = "#d69e2e";
+        probEl.style.color = "#d69e2e";
+    } else {
+        boxEl.style.borderColor = "var(--blue)";
+        boxEl.style.background = "#ebf8ff";
+        titleEl.style.color = "var(--blue)";
+        probEl.style.color = "var(--blue)";
+    }
+}
+
+
 function updateLiveExpect(scores, sum) {
     let expectEl = document.getElementById("cz_live_expect");
     let distEl = document.getElementById("cz_live_rank_distribution");
@@ -2893,6 +2991,7 @@ function updateLiveExpect(scores, sum) {
         probEl.innerText = "0.0%";
         if(expPtEl) expPtEl.innerText = "期待所持pt: -- pt";
         currentCzSuccessProb = 0;
+        updateExpectBoxColor(0);
         if(czThruData[currCzThru] && czThruData[currCzThru].res !== 'unreached' && czThruData[currCzThru].res !== 'none') {
             expectEl.innerText = "決着済み";
             expectEl.style.color = "#666";
@@ -2915,6 +3014,7 @@ function updateLiveExpect(scores, sum) {
         if(expPtEl) expPtEl.innerText = "期待所持pt: -- pt";
         distEl.innerHTML = "";
         currentCzSuccessProb = 0;
+        updateExpectBoxColor(0);
         return; 
     } 
     if(ranks.D > 0.99) { 
@@ -2924,6 +3024,7 @@ function updateLiveExpect(scores, sum) {
         if(expPtEl) expPtEl.innerText = "期待所持pt: 16.0 pt以上";
         distEl.innerHTML = "";
         currentCzSuccessProb = 1.0;
+        updateExpectBoxColor(100);
         return; 
     } 
 
@@ -3029,6 +3130,8 @@ function updateLiveExpect(scores, sum) {
     let totalProb = (successProb * (1 - ranks.D)) + ranks.D;
     currentCzSuccessProb = totalProb;
     probEl.innerText = (totalProb * 100).toFixed(1) + "%";
+    
+    updateExpectBoxColor(totalProb * 100);
     
     if(expPtEl) expPtEl.innerText = `期待所持pt: ${expectedPt.toFixed(1)} pt`;
 
@@ -3155,7 +3258,7 @@ function calcAll() {
     let mysTotal = mysN + mysH + mysS;
     
     let elMysTotal = document.getElementById("disp_mys_total"); if(elMysTotal) elMysTotal.innerText = mysTotal;
-    let elMysProb = document.getElementById("disp_mys_prob"); if(elMysProb) elMysProb.innerText = (cbG > 0 && mysTotal > 0) ? `(1/${Math.round(cbG / mysTotal)})` : "(--)";
+    let elMysProb = document.getElementById("disp_mys_prob"); if(elMysProb) elMysProb.innerText = (daiG > 0 && mysTotal > 0) ? `(1/${Math.round(daiG / mysTotal)})` : "(--)";
     let elMysNCnt = document.getElementById("disp_mys_n_cnt"); if(elMysNCnt) elMysNCnt.innerText = mysN;
     let elMysHCnt = document.getElementById("disp_mys_h_cnt"); if(elMysHCnt) elMysHCnt.innerText = mysH;
     let elMysSCnt = document.getElementById("disp_mys_s_cnt"); if(elMysSCnt) elMysSCnt.innerText = mysS;
@@ -3402,12 +3505,12 @@ function calcAll() {
         if(r.d.t > 0 && r.d.hit > 0) addFactor(r.k, r.nm, DAT[r.k].map(p => dBinom(r.d.hit, r.d.t, p)));
     });
 
-    if(cbG > 0) {
+    if(daiG > 0) {
         [0, 1, 2].forEach(st => {
             let h = tStats.mys_hit[st];
             if(h > 0) {
                 let nms = ['通常', '高確', '超高確'];
-                addFactor(`mys_${st}`, `謎当たり(${nms[st]})`, DAT.mys_tot.map((tot, s) => dBinom(h, cbG, tot * DAT.mys_dst[s][st])));
+                addFactor(`mys_${st}`, `謎当たり(${nms[st]})`, DAT.mys_tot.map((tot, s) => dBinom(h, daiG, tot * DAT.mys_dst[s][st])));
             }
         });
     }
@@ -3522,6 +3625,7 @@ function calcAll() {
 
 function showInfo(id) {
     let t = "";
+    if(id==='games_info') t = "G数入力と確率分母について";
     if(id==='main_count') t = "小役・初当り確率";
     if(id==='rendou_epi') t = "エピソードボーナス当選率";
     if(id==='rendou_hit') t = "小役からの初当り当選率";
