@@ -184,7 +184,7 @@
 <body>
 
 <div class="container">
-    <h1 style="position: relative;">SLOT Sword Art Online<br> Estimation Tool<span style="position: absolute; right: 5px; bottom: 0; font-size: 0.8rem; color: #888; font-weight: normal; margin-left: 5px;">(v2.2.1)</span></h1>
+    <h1 style="position: relative;">SLOT Sword Art Online<br> Estimation Tool<span style="position: absolute; right: 5px; bottom: 0; font-size: 0.8rem; color: #888; font-weight: normal; margin-left: 5px;">(v2.2.2)</span></h1>
 
     <div class="main-tabs">
         <button class="m-tab-btn active" onclick="switchMainTab(1)">小役･初当り</button>
@@ -407,11 +407,16 @@
             <div class="disabled-message sticky-message">CZ成功 / 失敗を<br>記録してください</div>
         </div>
 
-        <div class="panel" style="text-align:center; padding: 10px;">
-            <div style="font-size:0.85rem; color:#666;">
+        <div class="panel" style="text-align:center;">
+            <div class="panel-title">
+    <span class="title-en">Scenario</span>
+    <span class="title-jp">高確移行シナリオ推測</span>
+    <button class="btn-info" onclick="showInfo('scenario')">ⓘ</button>
+</div>
+<div style="font-size:0.85rem; color:#666;">
                 現在最有力シナリオ (レベル)
-                <button class="btn-info" style="margin-left:5px;" onclick="showInfo('scenario')">ⓘ</button>
-            </div>
+</div>
+
             <div style="font-size:1.8rem; font-weight:bold; color:var(--accent);" id="scen_top_name">--</div>
             <div style="font-size:1.2rem; font-weight:bold; color:var(--accent); margin: 3px 0;" id="scen_top_prob">-%</div>
             <div style="font-size:0.9rem; margin-bottom: 5px;" id="scen_top_lv">Lv.--</div>
@@ -1117,6 +1122,20 @@
 <div class="modal-overlay" id="modal_hit_3">
     <div class="modal-content">
         <div class="modal-title">ボスバトル初戦の勝敗</div>
+        
+        <div style="margin-bottom:15px;">
+            <div style="font-size:0.9rem; font-weight:bold; margin-bottom:5px;">出現ミニキャラ (スワイプ)</div>
+            <select id="sel_hit3_minichara" style="width:100%; padding:8px; border-radius:4px; border:1px solid var(--border);">
+                <option value="none">確認なし / 選択しない</option>
+                <option value="c_liz">リズベット</option>
+                <option value="c_sil">シリカ</option>
+                <option value="c_asu">アスナ</option>
+                <option value="c_yui">ユイ</option>
+                <option value="c_sac">サチ (設定4以上)</option>
+                <option value="c_kay">茅場 (設定6確定)</option>
+            </select>
+        </div>
+        
         <button class="modal-btn primary" onclick="handleHitModal3('win')">ボスバトル 初戦勝利</button>
         <button class="modal-btn danger" onclick="handleHitModal3('lose')">ボスバトル 初戦敗北</button>
         <button class="modal-btn" style="margin-top:15px; background:#ddd; color:#333;" onclick="closeModals()">キャンセル</button>
@@ -1866,6 +1885,9 @@ function closeModals() {
     document.getElementById("modal_hist_edit").style.display = "none";
     document.getElementById("modal_cz_fail_voice").style.display = "none";
 
+let selMini = document.getElementById("sel_hit3_minichara");
+    if (selMini) selMini.value = 'none';
+
     if (isCzMode && czThruData[currCzThru] && czThruData[currCzThru].res === 'success') {
         czThruData[currCzThru].res = 'unreached';
         calcCzTable();
@@ -1905,6 +1927,11 @@ function handleHitModal2(res2) {
 
 function handleHitModal3(res3) {
     pendingHit.res3 = res3;
+    let selMini = document.getElementById("sel_hit3_minichara");
+    if (selMini && selMini.value !== 'none') {
+        changeCounter(selMini.value, 1);
+        selMini.value = 'none';
+    }
     processHit();
 }
 
@@ -2720,9 +2747,7 @@ function calcCzTable() {
                 if(currentType === 'cook' && refRank !== 'C') { scores[t] = 0; break; }
 
                 if (currentType === 'sao') {
-                    if ((currentLamp === 'green' || currentLamp === 'sao_green') && refRank === 'A') { scores[t] = 0; break; }
-                    if ((currentLamp === 'red' || currentLamp === 'sao_red') && refRank === 'A') { scores[t] = 0; break; }
-                }
+                                    }
 
                 if(currentVoice === 'c_rich' && (refRank !== 'C' && refRank !== 'D')) { scores[t] = 0; break; }
                 if(currentVoice === 'high_rich') {
@@ -3523,19 +3548,56 @@ function calcAll() {
         addFactor('scen_fail', 'CZ失敗後シナリオ移行', failTransScores);
     }
     
-    let isCzMorn = document.getElementById("chk_cz_morn") ? document.getElementById("chk_cz_morn").checked : false;
-    if (isCzMorn && window.currentCzTableProbs) {
-        let mornScores = [0,0,0,0,0,0];
+    // ▼▼▼ CZテーブル推測の合算処理 ▼▼▼
+    let combinedTableScores = [1, 1, 1, 1, 1, 1];
+    let hasTableData = false;
+
+    // ① 現在進行中の推測（メイン画面のチェックボックス）
+    let isCurrentIncluded = document.getElementById("chk_cz_morn") ? document.getElementById("chk_cz_morn").checked : false;
+    if (isCurrentIncluded && window.currentCzTableProbs) {
+        let currentScores = [0,0,0,0,0,0];
         for(let s=0; s<6; s++) {
             for(let t=1; t<=12; t++) {
-                mornScores[s] += window.currentCzTableProbs[t] * DAT.cz_table_morn[t][s];
+                currentScores[s] += window.currentCzTableProbs[t] * DAT.cz_table_morn[t][s];
             }
         }
-        let mSum = mornScores.reduce((a,b)=>a+b,0);
-        if (mSum > 0) {
-            addFactor('cz_morn_table', '朝イチCZテーブル', mornScores);
+        let cSum = currentScores.reduce((a,b)=>a+b,0);
+        if (cSum > 0) {
+            for(let s=0; s<6; s++) combinedTableScores[s] *= currentScores[s];
+            hasTableData = true;
         }
     }
+
+    // ② 履歴の「合算に含める」チェック
+    if (historyLog && historyLog.length > 0) {
+        historyLog.forEach((h) => {
+            if (h.res1 !== 'cz_fail' && h.isCzMorn && h.czRanks && h.czRanks.length > 0) {
+                let hScores = [0,0,0,0,0,0];
+                let tableProbs = {};
+                h.czRanks.forEach(r => tableProbs[r.t] = r.p);
+                for(let s=0; s<6; s++) {
+                    for(let t=1; t<=12; t++) {
+                        if (tableProbs[t] !== undefined) hScores[s] += tableProbs[t] * DAT.cz_table_morn[t][s];
+                    }
+                }
+                let mSum = hScores.reduce((a,b)=>a+b,0);
+                if (mSum > 0) {
+                    for(let s=0; s<6; s++) combinedTableScores[s] *= hScores[s];
+                    hasTableData = true;
+                }
+            }
+        });
+    }
+
+    // ③ 合算して1つの推測要素にする
+    if (hasTableData) {
+        let sumCombined = combinedTableScores.reduce((a,b)=>a+b,0);
+        if (sumCombined > 0) {
+            let normalizedScores = combinedTableScores.map(v => v / sumCombined);
+            addFactor('cz_table_all', 'テーブル推測結果 (合算)', normalizedScores);
+        }
+    }
+    // ▲▲▲ ここまで ▲▲▲
 
     let atArr = [1,1,1,1,1,1]; let hasAt = false;
     for(let c=0; c<6; c++) {
@@ -4535,7 +4597,12 @@ function recalculateHistorySegmentRanks(historyIdx) {
         let h = historyLog[i];
         if (h.czLog) tempThruData[cThru] = JSON.parse(JSON.stringify(h.czLog));
         if (i === endIdx) {
-            tempThruData[cThru].res = (h.res1 === 'cz_ok') ? 'success' : 'direct';
+            // 元のログに結果が正しく記録されていればそれを最優先する
+            if (h.czLog && h.czLog.res && h.czLog.res !== 'none' && h.czLog.res !== 'unreached') {
+                tempThruData[cThru].res = h.czLog.res;
+            } else {
+                tempThruData[cThru].res = (h.res1 === 'cz_ok') ? 'success' : 'direct';
+            }
         } else {
             tempThruData[cThru].res = 'fail';
             cThru++;
@@ -4581,17 +4648,17 @@ function recalculateHistorySegmentRanks(historyIdx) {
     // 計算結果を履歴データに上書き保存
     let sum = 0;
     for(let t=1; t<=12; t++) sum += scores[t];
-    let newRanks = [];
+    
+    // sum === 0 (矛盾発生時) は元データを消さずに保護する
     if (sum > 0) {
+        let newRanks = [];
         for(let t=1; t<=12; t++) {
             if (scores[t] > 0) newRanks.push({t: t, p: scores[t]/sum});
         }
         newRanks.sort((a,b) => b.p - a.p);
         historyLog[endIdx].czTopName = `現在の最有力: テーブル ${newRanks[0].t} (${(newRanks[0].p * 100).toFixed(1)}%)`;
-    } else {
-        historyLog[endIdx].czTopName = "矛盾あり（判定不能）";
+        historyLog[endIdx].czRanks = newRanks;
     }
-    historyLog[endIdx].czRanks = newRanks;
 }
 
 
