@@ -3527,7 +3527,7 @@ function calcAll() {
         {k:'hit_s_wc', nm:'超高確:弱チェ',d:tStats.wc[2]}, {k:'hit_s_wm', nm:'超高確:スイカ',d:tStats.wm[2]}, {k:'hit_s_sr', nm:'超高確:強レア',d:tStats.sr[2]}
     ];
     rMap.forEach(r => {
-        if(r.d.t > 0 && r.d.hit > 0) addFactor(r.k, r.nm, DAT[r.k].map(p => dBinom(r.d.hit, r.d.t, p)));
+        if(r.d.t > 0) addFactor(r.k, r.nm, DAT[r.k].map(p => dBinom(r.d.hit, r.d.t, p)));
     });
 
     if(daiG > 0) {
